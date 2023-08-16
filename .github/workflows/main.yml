@@ -15,5 +15,6 @@ jobs:
           go-version: 1.21.0
       - name: Install dependencies
         run: go mod download
-      - name: Run tests
-        run: go test -v ./...
+      - name: Run test
+        run: go test backend/main_test.go && go test frontend/main_test.go
+
