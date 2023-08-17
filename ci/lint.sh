@@ -9,9 +9,12 @@ if ! command -v go &> /dev/null; then
     export GOPATH=$HOME/go
     export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 fi
+
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
 
+which golangci-lint || echo "golangci-lint is not installed or not in PATH"
+
 echo "Linting frontend..."
-golangci-lint run frotnend/...
+golangci-lint run ./frontend/...
 echo "Linting backend..."
-golangci-lint run backend/...
+golangci-lint run ./backend/...
