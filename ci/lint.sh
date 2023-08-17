@@ -10,7 +10,7 @@ if ! command -v go &> /dev/null; then
     export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 fi
 
-go install github.com/golangci/golangci-lint/cmd/golangci-lint
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 which golangci-lint || echo "golangci-lint is not installed or not in PATH"
 
