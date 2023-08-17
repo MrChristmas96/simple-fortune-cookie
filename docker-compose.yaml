@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend/ # This directory should contain the Dockerfile for your frontend service
+    ports:
+      - "8080:8080"
+
+  backend:
+    build:
+      context: ./backend/ # This directory should contain the Dockerfile for your backend service
+    ports:
+      - "9000:9000"
