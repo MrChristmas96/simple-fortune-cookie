@@ -90,6 +90,7 @@ jobs:
           docker-compose down
 
   load-test:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -97,7 +98,7 @@ jobs:
         
       - name: Pull docker image
         run: docker pull rufus/siege-engine:latest
-        
+
       - name: Build Docker image
         run: docker build -t rufus/siege-engine:latest .
 
