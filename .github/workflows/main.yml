@@ -76,3 +76,10 @@ jobs:
       - name: Shut down Docker Compose
         run: |
           docker-compose down
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Deploy
+        run: chmod +x ci/deploy.sh && ci/deploy.sh
