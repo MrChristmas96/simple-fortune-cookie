@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"math/rand"
+	"fmt"
 	"net/http"
 	"regexp"
 	"sync"
@@ -13,7 +14,6 @@ var (
 	getFortuneRe    = regexp.MustCompile(`^/fortunes[/](\d+)$`)
 	randomFortuneRe = regexp.MustCompile(`^/fortunes[/]random$`)
 	createFortuneRe = regexp.MustCompile(`^/fortunes[/]*$`)
-	usingRedis      = false // Declaration for usingRedis variable
 )
 
 type fortune struct {
