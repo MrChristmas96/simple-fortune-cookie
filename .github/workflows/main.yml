@@ -53,4 +53,4 @@ jobs:
       - name: pulls image
         run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
       - name: Run test
-        run: go test frontend
+        run: go test frontend/frontend
