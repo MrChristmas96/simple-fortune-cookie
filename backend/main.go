@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
+	"fmt"
 	"net/http"
 	"regexp"
 	"sync"
@@ -71,8 +71,7 @@ func (h *fortuneHandler) List(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonBytes)
+	_, _ = w.Write(jsonBytes)
 }
 
 func (h *fortuneHandler) Random(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +106,7 @@ func (h *fortuneHandler) Get(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("redis hget failed", err.Error())
 		} else {
 			if val != nil {
-				msg := fmt.Sprintf("%s", val.([]byte))
+				msg := string(val.([]byte))
 				h.store.Lock()
 				h.store.m[key] = fortune{ID: key, Message: msg}
 				h.store.Unlock()
@@ -120,8 +119,7 @@ func (h *fortuneHandler) Get(w http.ResponseWriter, r *http.Request) {
 	h.store.RUnlock()
 
 	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("fortune not found"))
+		_, _ = w.Write([]byte("fortune not found"))
 		return
 	}
 	jsonBytes, err := json.Marshal(u)
@@ -129,8 +127,7 @@ func (h *fortuneHandler) Get(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonBytes)
+	_, _ = w.Write(jsonBytes)
 }
 
 func (h *fortuneHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -155,18 +152,15 @@ func (h *fortuneHandler) Create(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonBytes)
+	_, _ = w.Write(jsonBytes)
 }
 
 func internalServerError(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte("internal server error"))
+	_, _ = w.Write([]byte("internal server error"))
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
-	w.Write([]byte("not found"))
+	_, _ = w.Write([]byte("not found"))
 }
 
 func main() {
@@ -177,6 +171,5 @@ func main() {
 	mux.Handle("/fortunes", fortuneH)
 	mux.Handle("/fortunes/", fortuneH)
 
-	http.ListenAndServe(":9000", mux)
-
+	_ = http.ListenAndServe(":9000", mux)
 }
