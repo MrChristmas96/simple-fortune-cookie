@@ -61,16 +61,18 @@ jobs:
     needs: [test]
     name: Availability Test
     steps:
-    - name: Pull Docker images
-      run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
-
-    - name: Run Docker Compose
-      run: |
-        docker-compose up -d
-
-    - name: Test availability
-      run: chmod +x ci/test-availability.sh && ci/test-availability.sh
-
-    - name: Shut down Docker Compose
-      run: |
-        docker-compose down
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: Pull Docker images
+        run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
+      - name: Run Docker Compose
+        run: |
+          docker-compose up -d
+      - name: Test availability
+        run: chmod +x ci/test-availability.sh && ci/test-availability.sh
+      - name: Shut down Docker Compose
+        run: |
+          docker-compose down
