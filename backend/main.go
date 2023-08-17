@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -14,6 +13,7 @@ var (
 	getFortuneRe    = regexp.MustCompile(`^/fortunes[/](\d+)$`)
 	randomFortuneRe = regexp.MustCompile(`^/fortunes[/]random$`)
 	createFortuneRe = regexp.MustCompile(`^/fortunes[/]*$`)
+	usingRedis      = false // Declaration for usingRedis variable
 )
 
 type fortune struct {
@@ -37,36 +37,25 @@ type fortuneHandler struct {
 	store *datastore
 }
 
-// The simplified error response function
-func respondWithError(w http.ResponseWriter, status int, message string) {
-	w.WriteHeader(status)
-	_, _ = w.Write([]byte(message))
-}
-
 func (h *fortuneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	switch {
 	case r.Method == http.MethodGet && listFortuneRe.MatchString(r.URL.Path):
 		h.List(w, r)
+		return
 	case r.Method == http.MethodGet && getFortuneRe.MatchString(r.URL.Path):
 		h.Get(w, r)
+		return
 	case r.Method == http.MethodGet && randomFortuneRe.MatchString(r.URL.Path):
 		h.Random(w, r)
+		return
 	case r.Method == http.MethodPost && createFortuneRe.MatchString(r.URL.Path):
 		h.Create(w, r)
+		return
 	default:
-		respondWithError(w, http.StatusNotFound, "not found")
-	}
-}
-
-// Simplified function for writing JSON to the response writer
-func writeJSONResponse(w http.ResponseWriter, data interface{}) {
-	jsonBytes, err := json.Marshal(data)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "internal server error")
+		notFound(w, r)
 		return
 	}
-	_, _ = w.Write(jsonBytes)
 }
 
 func (h *fortuneHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +66,12 @@ func (h *fortuneHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	h.store.RUnlock()
 
-	writeJSONResponse(w, fortunes)
+	jsonBytes, err := json.Marshal(fortunes)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+	_, _ = w.Write(jsonBytes)
 }
 
 func (h *fortuneHandler) Random(w http.ResponseWriter, r *http.Request) {
@@ -101,34 +95,72 @@ func (h *fortuneHandler) Random(w http.ResponseWriter, r *http.Request) {
 func (h *fortuneHandler) Get(w http.ResponseWriter, r *http.Request) {
 	matches := getFortuneRe.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		respondWithError(w, http.StatusNotFound, "not found")
+		notFound(w, r)
 		return
 	}
 
-	key := matches[1]
+	if usingRedis {
+		key := matches[1]
+		val, err := dbLink.Do("hget", "fortunes", key)
+		if err != nil {
+			fmt.Println("redis hget failed", err.Error())
+		} else {
+			if val != nil {
+				msg := string(val.([]byte))
+				h.store.Lock()
+				h.store.m[key] = fortune{ID: key, Message: msg}
+				h.store.Unlock()
+			}
+		}
+	}
 
 	h.store.RLock()
-	u, ok := h.store.m[key]
+	u, ok := h.store.m[matches[1]]
 	h.store.RUnlock()
 
 	if !ok {
-		respondWithError(w, http.StatusNotFound, "fortune not found")
+		_, _ = w.Write([]byte("fortune not found"))
 		return
 	}
-	writeJSONResponse(w, u)
+	jsonBytes, err := json.Marshal(u)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+	_, _ = w.Write(jsonBytes)
 }
 
 func (h *fortuneHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var u fortune
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		respondWithError(w, http.StatusInternalServerError, "internal server error")
+		internalServerError(w, r)
 		return
 	}
 	h.store.Lock()
 	h.store.m[u.ID] = u
 	h.store.Unlock()
 
-	writeJSONResponse(w, u)
+	if usingRedis {
+		_, err := dbLink.Do("hset", "fortunes", u.ID, u.Message)
+		if err != nil {
+			fmt.Println("redis hset failed", err.Error())
+		}
+	}
+
+	jsonBytes, err := json.Marshal(u)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+	_, _ = w.Write(jsonBytes)
+}
+
+func internalServerError(w http.ResponseWriter, r *http.Request) {
+	_, _ = w.Write([]byte("internal server error"))
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	_, _ = w.Write([]byte("not found"))
 }
 
 func main() {
@@ -139,8 +171,5 @@ func main() {
 	mux.Handle("/fortunes", fortuneH)
 	mux.Handle("/fortunes/", fortuneH)
 
-	err := http.ListenAndServe(":9000", mux)
-	if err != nil {
-		fmt.Println("Failed to start the server:", err)
-	}
+	_ = http.ListenAndServe(":9000", mux)
 }
