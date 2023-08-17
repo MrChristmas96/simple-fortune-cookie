@@ -6,7 +6,7 @@ on:
 
 env:
   docker_username: ${{ github.repository_owner }}
-  docker_password: ${{ secrets.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 }}
+  docker_password: ${{ secrets.GITHUB_TOKEN }}
   GIT_COMMIT: ${{ github.sha }}
 
 jobs:
