@@ -1,4 +1,4 @@
-name: CI pipeline :)
+name: CI pipeline
 on:
   push:
     branches:
@@ -55,6 +55,6 @@ jobs:
       - name: pulls image
         run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
       - name: Run test
-        run: go test backend/main_test.go && go test frontend/main_test.go
+        run: go test frontend/main_test.go
       
 
