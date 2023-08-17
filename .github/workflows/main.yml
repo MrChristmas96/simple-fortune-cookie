@@ -29,6 +29,8 @@ jobs:
         with:
           name: code
           path: . 
+      - name: init
+        run: go mod init ../../frontend && go mod init ../../backend
       - name: Build 
         run: go build -v ../../frontend && go build -v ../../backend
   test:
