@@ -54,3 +54,15 @@ jobs:
         run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
       - name: Run test
         run: cd ./frontend && go test
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: pulls image
+        run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
