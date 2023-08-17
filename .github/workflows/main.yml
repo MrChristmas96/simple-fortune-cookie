@@ -4,9 +4,11 @@ on:
     branches:
       - main
 jobs:
-  install:
+  init:
     runs-on: ubuntu-latest
     steps:
+      - name: Clone Repo
+        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -14,7 +16,7 @@ jobs:
           go-version: 1.21.0
   build:
     runs-on: ubuntu-latest
-    needs: [install]
+    needs: [init]
     steps:
       - name: Build 
         run: go build -v ./frontend && go build -v ./backend
