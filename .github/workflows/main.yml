@@ -85,6 +85,8 @@ jobs:
           docker-compose up -d
       - name: Test availability
         run: chmod +x ci/test-availability.sh && ci/test-availability.sh
+      - name: Test penetration
+        run: chmod +x ci/setup-pentest.sh && ci/setup-pentest.sh
       - name: Shut down Docker Compose
         run: |
           docker-compose down
