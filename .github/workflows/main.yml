@@ -36,12 +36,22 @@ jobs:
         run: chmod +x ci/build-docker.sh && ci/build-docker.sh
       - name: push
         run: chmod +x ci/push-docker.sh && ci/push-docker.sh
+      - name: Upload Repo
+        uses: actions/upload-artifact@v3
+        with:
+          name: code
+          path: .
 
 
   test:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: . 
       - name: pulls image
         run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
       - name: Run test
