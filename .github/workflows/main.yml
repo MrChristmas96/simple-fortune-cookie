@@ -1,4 +1,5 @@
 name: CI pipeline
+permissions: write-all
 on:
   pull_request:
     branches:
