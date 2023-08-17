@@ -106,7 +106,7 @@ jobs:
         run: |
           docker-compose up -d
       - name: Run Siege
-        run: docker run rufus/siege-engine siege -c 10 -t 1M http://localhost:8080
+        run: docker run --network host rufus/siege-engine siege -c 10 -t 1M http://localhost:8080
       - name: Shut down Docker Compose
         run: |
           docker-compose down
