@@ -12,11 +12,10 @@ fi
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
 
 echo "Linting frontend..."
-pushd frontend
-golangci-lint run ./...
+golangci-lint run frotnend/...
 popd
 
 echo "Linting backend..."
 pushd backend
-golangci-lint run ./...
+golangci-lint run backend/...
 popd
