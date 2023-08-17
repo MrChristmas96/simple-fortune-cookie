@@ -93,17 +93,26 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: Pull docker image
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: Pull repo docker images
+        run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
+      - name: Pull siege docker image
         run: docker pull rufus/siege-engine:latest
-
+      - name: Run Docker Compose
+        run: |
+          docker-compose up -d
       - name: Build Docker image
-        run: docker build -t rufus/siege-engine:latest .
-
+        run: docker build -t rufus/siege-engine .
       - name: Run Siege
-        run: docker run my-siege-image siege -c 10 -t 1M http://localhost:8080
+        run: docker run rufus/siege-engine siege -c 10 -t 1M http://localhost:8080
+      - name: Shut down Docker Compose
+        run: |
+          docker-compose down
+
 
 
 
