@@ -105,8 +105,6 @@ jobs:
       - name: Run Docker Compose
         run: |
           docker-compose up -d
-      - name: Build Docker image
-        run: docker build -t rufus/siege-engine .
       - name: Run Siege
         run: docker run rufus/siege-engine siege -c 10 -t 1M http://localhost:8080
       - name: Shut down Docker Compose
