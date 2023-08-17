@@ -81,5 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
       - name: Deploy
         run: chmod +x ci/deploy.sh && ci/deploy.sh
