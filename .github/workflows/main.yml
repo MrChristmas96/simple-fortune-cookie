@@ -33,9 +33,9 @@ jobs:
           name: code
           path: . 
       - name: builds backend and frontend
-        run: ci/build-docker.sh
+        run: chmod +x ci/build-docker.sh && ci/build-docker.sh
       - name: push
-        run: ci/push-docker.sh
+        run: chmod +x ci/push-docker.sh && ci/push-docker.sh
 
 
   test:
@@ -43,7 +43,7 @@ jobs:
     needs: [Build]
     steps:
       - name: pulls image
-        run: ci/pull-docker.sh
+        run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
       - name: Run test
         run: go test backend/main_test.go && go test frontend/main_test.go
       
