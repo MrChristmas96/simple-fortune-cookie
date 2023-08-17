@@ -58,17 +58,18 @@ jobs:
 
   availability-test:
     runs-on: ubuntu-latest
+    needs: [test]
     name: Availability Test
     steps:
     - name: Pull Docker images
-      run: bash ci/pull-docker.sh
+      run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
 
     - name: Run Docker Compose
       run: |
         docker-compose up -d
 
     - name: Test availability
-      run: bash ci/test-availability.sh
+      run: chmod +x ci/test-availability.sh && ci/test-availability.sh
 
     - name: Shut down Docker Compose
       run: |
