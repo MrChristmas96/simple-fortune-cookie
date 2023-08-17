@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels: 
+    app: backend-deployment
   name: backend-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: backend-deployment
   template:
     metadata:
       labels:
-        app: backend
+        app: backend-deployment
     spec:
       containers:
-        - name: backend
-          image: ghcr.io/mrchristmas96/simple-fortune-cookie/simple-fortune-cookie-backend:latest
-          ports:
-            - containerPort: 9000
+        - image: ghcr.io/mrchristmas96/simple-fortune-cookie/simple-fortune-cookie-backend:latest
+          name: simple-fortune-cookie-backend
           env:
             - name: REDIS_DNS
               value: redis
