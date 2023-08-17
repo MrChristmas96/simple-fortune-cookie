@@ -59,7 +59,7 @@ jobs:
     needs: [Build, lint]
     steps:
       - name: Download code
-        uses: actions/download-xtartifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: code
           path: .
