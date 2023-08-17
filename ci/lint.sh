@@ -16,6 +16,10 @@ which golangci-lint || echo "golangci-lint is not installed or not in PATH"
 
 echo "Linting frontend..."
 ls -la
-$(go env GOPATH)/bin/golangci-lint run /frontend/...
+cd frontend/
+echo "Linting frontend..."
+$(go env GOPATH)/bin/golangci-lint run ./...
+cd ..
+cd backend/
 echo "Linting backend..."
 $(go env GOPATH)/bin/golangci-lint run /backend/...
