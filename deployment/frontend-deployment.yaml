@@ -22,4 +22,3 @@ spec:
               value: "9000"
             - name: BACKEND_DNS
               value: backend
-          type: 
