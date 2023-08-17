@@ -22,6 +22,18 @@ jobs:
         with:
           name: code
           path: .
+  
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+    - name: Download code
+      uses: actions/download-artifact@v3
+      with:
+        name: code
+        path: .
+    - name: Run Linting Script
+      run: ./lint.sh
 
   Build:
     runs-on: ubuntu-latest
