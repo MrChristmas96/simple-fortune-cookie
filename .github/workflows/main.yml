@@ -56,10 +56,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [Build, lint]
     steps:
       - name: Download code
-        uses: actions/download-artifact@v3
+        uses: actions/download-xtartifact@v3
         with:
           name: code
           path: .
