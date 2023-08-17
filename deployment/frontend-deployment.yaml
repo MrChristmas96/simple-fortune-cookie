@@ -1,37 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: frontend-deployment
   name: frontend-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: frontend-deployment
   template:
     metadata:
       labels:
-        app: frontend
+        app: frontend-deployment
     spec:
       containers:
-        - name: frontend
-          image: your-frontend-image:tag
-          ports:
-            - containerPort: 8080
+        - image: ghcr.io/mrchristmas96/simple-fortune-cookie/simple-fortune-cookie-frontend:latest
+          name: simple-fortune-cookie-frontend
           env:
             - name: BACKEND_PORT
               value: "9000"
             - name: BACKEND_DNS
-              value: backend
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-spec:
-  selector:
-    app: frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer
+              value: backend-service
