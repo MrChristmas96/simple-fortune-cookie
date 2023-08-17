@@ -14,12 +14,22 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.21.0
+      - name: Upload Repo
+        uses: actions/upload-artifact@v3
+        with:
+          name: code
+          path: .
   build:
     runs-on: ubuntu-latest
     needs: [init]
     steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: . 
       - name: Build 
-        run: go build -v ./frontend && go build -v ./backend
+        run: go build -v ../../frontend && go build -v ../../backend
   test:
     runs-on: ubuntu-latest
     needs: [build]
