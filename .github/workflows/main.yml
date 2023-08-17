@@ -1,20 +1,24 @@
-name: Continuous Integration
-on:
-  push:
-    branches:
-      - main
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.21.0
-      - name: Install dependencies
-        run: go mod download
-      - name: Run test
-        run: go test backend/main_test.go && go test frontend/main_test.go
 
+on: push
+jobs:
+  Build:
+    name: Main ci workflow
+    runs-on: ubuntu-latest
+    container: gradle:6-jdk11
+    steps:
+      - name: Clone-down
+        uses: actions/checkout@v3       
+      - name: Build application
+        run: go build -o backend && go build -o frontend
+      - name: Test
+        run: go test backend/my_test.go && go test frontend/my_test.go
+      - name: Upload Repo
+        uses: actions/upload-artifact@v3
+        with: 
+          name: code
+          path: .
+      - name: Upload Jar
+        uses: actions/upload-artifact@v3
+        with: 
+          name: jar
+          path: app/build/libs/app-0.1-all.jar
