@@ -73,5 +73,7 @@ jobs:
         with:
           name: code
           path: .
-      - name: Deploy
-        run: chmod +x ci/deploy.sh && ci/deploy.sh
+      - name: Get Config
+        run: echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > kubeconfig
+      - name: Deploy Dev
+        run: kubectl --kubeconfig kubeconfig kubectl apply -f deployment/.
