@@ -1,0 +1,77 @@
+name: CI pipeline (DEV)
+permissions: write-all
+on: push
+env:
+  docker_username: ${{ github.repository_owner }}
+  docker_password: ${{ secrets.GITHUB_TOKEN }}
+  GIT_COMMIT: ${{ github.sha }}
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v3
+
+      - name: Upload Repo
+        uses: actions/upload-artifact@v3
+        with:
+          name: code
+          path: .
+  
+  lint:
+    runs-on: ubuntu-latest
+    needs: [init]
+    steps:
+    - name: Download code
+      uses: actions/download-artifact@v3
+      with:
+        name: code
+        path: .
+    - name: Run Linting Script
+      run: chmod +x ci/lint.sh && ci/lint.sh
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [init]
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: builds backend and frontend
+        run: chmod +x ci/build-docker.sh && ci/build-docker.sh
+      - name: push
+        run: chmod +x ci/push-docker.sh && ci/push-docker.sh
+      - name: Upload Repo
+        uses: actions/upload-artifact@v3
+        with:
+          name: code
+          path: .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [build, lint]
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: pulls image
+        run: chmod +x ci/pull-docker.sh && ci/pull-docker.sh
+      - name: Run test
+        run: cd ./frontend && go test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [availability-test, load-test]
+    steps:
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: code
+          path: .
+      - name: Deploy
+        run: chmod +x ci/deploy.sh && ci/deploy.sh
