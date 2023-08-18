@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - closed
 
 env:
   docker_username: ${{ github.repository_owner }}
@@ -133,5 +135,5 @@ jobs:
           path: .
       - name: Get Config
         run: echo "${{ secrets.KUBECONFIG_PROD }}" | base64 -d > kubeconfig
-      - name: Deploy Dev
+      - name: Deploy Prod
         run: kubectl --kubeconfig kubeconfig apply -f deployment/.
