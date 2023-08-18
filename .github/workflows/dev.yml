@@ -1,6 +1,7 @@
 name: CI pipeline (DEV)
 permissions: write-all
 on: push
+
 env:
   docker_username: ${{ github.repository_owner }}
   docker_password: ${{ secrets.GITHUB_TOKEN }}

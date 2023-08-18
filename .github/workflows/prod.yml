@@ -2,10 +2,8 @@ name: CI pipeline (PROD)
 permissions: write-all
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - closed
+    branches: ['main']
+    types: [closed]
 
 env:
   docker_username: ${{ github.repository_owner }}
