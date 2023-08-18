@@ -106,7 +106,15 @@ jobs:
         run: |
           docker-compose up -d
       - name: Run Siege
-        run: docker run --network host rufus/siege-engine siege -c 10 -t 1M http://localhost:8080
+        id: siege_run # Assigning an ID for this step to access its outputs
+        run: |
+          docker run --network host rufus/siege-engine siege -c 10 -t 1M http://localhost:8080 || echo "Siege-failed" > siege_status.txt
+      - name: Check Siege Status
+        run: |
+          if [[ -f "siege_status.txt" && $(cat siege_status.txt) == "Siege-failed" ]]; then
+            echo "Siege encountered a failure!"
+            exit 1
+          fi
       - name: Shut down Docker Compose
         run: |
           docker-compose down
