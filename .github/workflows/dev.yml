@@ -76,4 +76,4 @@ jobs:
       - name: Get Config
         run: echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > kubeconfig
       - name: Deploy Dev
-        run: kubectl --kubeconfig kubeconfig kubectl apply -f deployment/.
+        run: kubectl --kubeconfig kubeconfig apply -f deployment/.
